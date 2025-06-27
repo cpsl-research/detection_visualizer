@@ -46,14 +46,16 @@ class DetectionVisualizerNode(Node):
         self._detections_sub = message_filters.Subscriber(self, Detection2DArray, '/detections')
 
         self._synchronizer = message_filters.ApproximateTimeSynchronizer(
-            (self._image_sub, self._detections_sub), 5, 0.01)
+            (self._image_sub, self._detections_sub), 30, 0.5)
         self._synchronizer.registerCallback(self.on_detections)
 
     def on_detections(self, image_msg, detections_msg):
         cv_image = self._bridge.imgmsg_to_cv2(image_msg)
+        # self.get_logger().info('Received image')
 
         # Draw boxes on image
         for detection in detections_msg.detections:
+            # self.get_logger().info('Received {} detections'.format(len(detection.results)))
             max_class = None
             max_score = 0.0
             for result in detection.results:
